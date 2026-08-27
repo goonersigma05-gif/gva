@@ -1981,8 +1981,11 @@ do
         local Groupbox = self;
         local Container = Groupbox.Container;
 
+        local Label = nil;
+        local BlankFrame = nil;
+
         if not Info.Compact then
-            Library:CreateLabel({
+            Label = Library:CreateLabel({
                 Size = UDim2.new(1, 0, 0, 10);
                 TextSize = 14;
                 Text = Info.Text;
@@ -1993,6 +1996,7 @@ do
             });
 
             Groupbox:AddBlank(3);
+            BlankFrame = Container:FindFirstChildOfClass('Frame');
         end
 
         local SliderOuter = Library:Create('Frame', {
@@ -2118,6 +2122,12 @@ do
 
             Library:SafeCallback(Slider.Callback, Slider.Value);
             Library:SafeCallback(Slider.Changed, Slider.Value);
+        end;
+
+        function Slider:SetVisible(Bool)
+            if Label then Label.Visible = Bool end;
+            if BlankFrame then BlankFrame.Visible = Bool end;
+            SliderOuter.Visible = Bool;
         end;
 
         SliderInner.InputBegan:Connect(function(Input)
