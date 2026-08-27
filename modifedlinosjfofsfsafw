@@ -48,9 +48,11 @@ local Library = {
 
 local RainbowStep = 0
 local Hue = 0
+local GlowPulse = 0
 
 table.insert(Library.Signals, RenderStepped:Connect(function(Delta)
     RainbowStep = RainbowStep + Delta
+    GlowPulse = GlowPulse + Delta * 1.8
 
     if RainbowStep >= (1 / 60) then
         RainbowStep = 0
@@ -63,6 +65,13 @@ table.insert(Library.Signals, RenderStepped:Connect(function(Delta)
 
         Library.CurrentRainbowHue = Hue;
         Library.CurrentRainbowColor = Color3.fromHSV(Hue, 0.8, 1);
+    end
+
+    if Library._GlowStrokes then
+        local alpha = (math.sin(GlowPulse) + 1) / 2
+        for _, gs in Library._GlowStrokes do
+            gs.Transparency = 0.35 + alpha * 0.35
+        end
     end
 end))
 
@@ -2969,6 +2978,21 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = ScreenGui;
     });
+
+    local GlowStroke = Library:Create('UIStroke', {
+        Color = Library.AccentColor;
+        Thickness = 2;
+        Transparency = 0.3;
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+        Parent = Outer;
+    });
+
+    Library:AddToRegistry(GlowStroke, {
+        Color = 'AccentColor';
+    });
+
+    Library._GlowStrokes = Library._GlowStrokes or {}
+    table.insert(Library._GlowStrokes, GlowStroke)
 
     Library:MakeDraggable(Outer, 25);
 
